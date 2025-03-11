@@ -77,7 +77,9 @@ plt.title('Performance Distribution of Stack Implementations')
 plt.show()
 
 #Array Stack has smaller distribution and smaller execution times.
-#makes sense, pytohn lists already optimized for pop and append at the end
+#makes sense, python lists pop and append are O(1) operations
 
-#Singly-linked-list has larger distribution and higher execution times
+#Singly-linked-list has larger distribution and higher execution times so it performs worse and less consistently.
 #makese sense, dynamic memory allocation for linked list nodes introduces overhead
+#we need more memory for the pointers, which increases access time and python has to allocate memory with every push
+#which is much more costly operation than just appending a list
