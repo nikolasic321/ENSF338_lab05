@@ -15,13 +15,14 @@ class ArrayQueue:
             return self.queue.pop()  # Remove from tail
         return None
 
-#Question 2 - queue using a singly linked list
+#Question 2 - queue using a doubly linked list
 class Node:
     def __init__(self, value):
         self.value = value
         self.next = None
+        self.prev = None
 
-class LinkedListQueue:
+class DoublyLinkedListQueue:
     def __init__(self):
         self.head = None
         self.tail = None
@@ -32,23 +33,18 @@ class LinkedListQueue:
             self.head = self.tail = new_node
         else:
             new_node.next = self.head
+            self.head.prev = new_node
             self.head = new_node
     
     def dequeue(self):
-        if not self.head:
+        if not self.tail:
             return None
-        if self.head == self.tail:
-            value = self.head.value
-            self.head = self.tail = None
-            return value
-        
-        current = self.head
-        while current.next != self.tail:
-            current = current.next
-        
         value = self.tail.value
-        self.tail = current
-        self.tail.next = None
+        if self.head == self.tail:
+            self.head = self.tail = None
+        else:
+            self.tail = self.tail.prev
+            self.tail.next = None
         return value
 
 
@@ -61,6 +57,7 @@ def generate_tasks(n=10000):
         else:
             tasks.append(('dequeue', None))
     return tasks
+
 
 #Question 4 - measure performance of both
 def measure_performance(queue_class, task_lists):
@@ -78,26 +75,28 @@ def measure_performance(queue_class, task_lists):
 task_lists = [generate_tasks() for _ in range(100)]
 
 array_times = [measure_performance(ArrayQueue, [tasks]) for tasks in task_lists]
-linked_list_times = [measure_performance(LinkedListQueue, [tasks]) for tasks in task_lists]
+dll_times = [measure_performance(DoublyLinkedListQueue, [tasks]) for tasks in task_lists]
 
 print("Array Stack Implementation Times: ", array_times)
-print("Linked List Stack Implementation Times: ", linked_list_times)
+print("Linked List Stack Implementation Times: ", dll_times)
 
 #Questoin 5- plot results
 plt.figure(figsize=(10, 6))
 plt.hist(array_times, bins=30, alpha=0.5, label='Array Queue', edgecolor='black')
-plt.hist(linked_list_times, bins=30, alpha=0.5, label='Linked List Queue', edgecolor='black')
+plt.hist(dll_times, bins=30, alpha=0.5, label='Doubly Linked List Queue', edgecolor='black')
 plt.xlabel('Execution Time (s)')
 plt.ylabel('Frequency')
-plt.yscale('log')  #using logarithmic scale to better distinguish
+plt.yscale('log')  #used a log scale to better see differences
 plt.legend()
 plt.title('Performance Distribution of Queue Implementations')
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.show()
 
 
-#Array Queue has very small distribution and small execution times.
-#makes sense, inserting from head and popping from tail is generally efficient for small lists
+#Array Queue has wider distribution of execution times, generally taking longer
+#makes sense, inserting from head is an O(n) operation since all elements must be shifted, even though removing from tail is O(1)
+#it doesn't makes up for it.
 
-#Singly-linked-list has larger distribution and higher execution times
-#makese sense, linked lists require traversal to remove the tail element, leading to O(n) complexity for each dequeue() operation.
+#Doubly Linked List Queue has a smaller distribution of execution times, generally taking less time since inserting at head is O(1)
+#and removing from tail is O(1) as well (enqueues are O(1) and dequeues are O(1)) since we have pointers to both head and tail.
+#there is also no need to shift elements around like in the array queue so its faster.
